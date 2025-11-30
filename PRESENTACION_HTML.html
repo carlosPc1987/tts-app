@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS APP - Presentación del Proyecto</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .slide {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 3px solid #764ba2;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            color: #764ba2;
+            font-size: 2em;
+            margin: 30px 0 20px 0;
+            border-left: 5px solid #667eea;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin: 20px 0 10px 0;
+        }
+
+        .intro {
+            text-align: center;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .feature-card h4 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .tech-badge {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .challenge {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .solution {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+
+        .timeline-item h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .conclusion {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .conclusion h2 {
+            color: white;
+            border: none;
+            padding: 0;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            margin: 10px 5px;
+            transition: transform 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .diagram-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .flow-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .flow-arrow {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .architecture-diagram {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .layer-box {
+            background: white;
+            border: 3px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .layer-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .flow-diagram {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .flow-box {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin: 10px;
+            min-width: 150px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .flow-arrow {
+            font-size: 2em;
+            color: #667eea;
+            margin: 0 10px;
+        }
+
+        .architecture-diagram {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .arch-layer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .arch-layer h4 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        @media print {
+            .slide {
+                page-break-after: always;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Slide 1: Portada -->
+        <div class="slide">
+            <h1>🎤 TTS APP</h1>
+            <div class="intro">
+                <h2>Text-to-Speech Application</h2>
+                <p style="font-size: 1.3em; margin-top: 20px; color: #667eea;">
+                    Aplicación Web Full-Stack con Spring Boot y React
+                </p>
+                <p style="margin-top: 30px; font-size: 1.1em;">
+                    Desarrollo completo en 2 semanas
+                </p>
+                <p style="margin-top: 20px; color: #666;">
+                    Noviembre 2025
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Introducción -->
+        <div class="slide">
+            <h2>🎯 ¿Qué es TTS APP?</h2>
+            <div class="intro">
+                <p style="font-size: 1.2em; margin: 20px 0;">
+                    Aplicación web completa que permite convertir texto a audio en tiempo real,
+                    gestionar contenidos y administrar usuarios con un sistema de roles avanzado.
+                </p>
+            </div>
+            <h3>Objetivos del Proyecto</h3>
+            <ul style="font-size: 1.1em;">
+                <li>Desarrollar una aplicación <span class="highlight">full-stack moderna</span></li>
+                <li>Aplicar principios de <span class="highlight">arquitectura SOLID</span></li>
+                <li>Implementar <span class="highlight">seguridad robusta</span> con JWT</li>
+                <li>Crear una <span class="highlight">experiencia de usuario</span> excepcional</li>
+                <li>Integrar servicios externos (<span class="highlight">Google TTS</span>)</li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: Arquitectura Detallada -->
+        <div class="slide">
+            <h2>🏗️ Arquitectura del Sistema</h2>
+            <h3>Arquitectura en Capas (Backend Java)</h3>
+            <div class="architecture-diagram">
+                <div class="arch-layer">
+                    <h4>🌐 Controller</h4>
+                    <p>Recibe HTTP</p>
+                    <p>Valida datos</p>
+                    <p>Llama a Service</p>
+                </div>
+                <div class="arch-layer">
+                    <h4>⚙️ Service</h4>
+                    <p>Lógica de negocio</p>
+                    <p>Llama a Repository</p>
+                    <p>Convierte DTOs</p>
+                </div>
+                <div class="arch-layer">
+                    <h4>💾 Repository</h4>
+                    <p>Accede a BD</p>
+                    <p>Ejecuta SQL</p>
+                    <p>Retorna Entities</p>
+                </div>
+            </div>
+            <div class="flow-diagram">
+                <div class="flow-box">HTTP Request</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Controller</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Service</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Repository</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Base de Datos</div>
+            </div>
+            <div class="mermaid">
+                graph TD
+                    A[Cliente/Usuario] -->|HTTP Request| B[Controller Java]
+                    B -->|Llama| C[Service Java]
+                    C -->|Llama| D[Repository JPA]
+                    D -->|SQL| E[(H2 Database)]
+                    E -->|Datos| D
+                    D -->|Entity| C
+                    C -->|DTO| B
+                    B -->|JSON Response| A
+            </div>
+        </div>
+
+        <!-- Slide 4: Stack Tecnológico -->
+        <div class="slide">
+            <h2>🛠️ Stack Tecnológico</h2>
+            <h3>Backend - Java</h3>
+            <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <strong>Lenguaje Principal:</strong> <span style="color: #d9534f; font-size: 1.2em;">Java 17</span>
+                <br><strong>Runtime:</strong> JVM (Java Virtual Machine)
+                <br><strong>Build Tool:</strong> Maven
+            </div>
+            <div class="tech-stack">
+                <span class="tech-badge">Java 17</span>
+                <span class="tech-badge">Spring Boot 3.3</span>
+                <span class="tech-badge">Spring Security</span>
+                <span class="tech-badge">Spring Data JPA</span>
+                <span class="tech-badge">H2 Database</span>
+                <span class="tech-badge">JWT</span>
+                <span class="tech-badge">Maven</span>
+                <span class="tech-badge">Lombok</span>
+                <span class="tech-badge">Google TTS</span>
+                <span class="tech-badge">Apache POI</span>
+                <span class="tech-badge">Apache PDFBox</span>
+            </div>
+            <h3 style="margin-top: 30px;">Frontend - JavaScript/Node.js</h3>
+            <div style="background: #d4edda; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <strong>Lenguaje Principal:</strong> <span style="color: #28a745; font-size: 1.2em;">JavaScript (ES6+)</span>
+                <br><strong>Runtime:</strong> Node.js
+                <br><strong>Package Manager:</strong> npm
+            </div>
+            <div class="tech-stack">
+                <span class="tech-badge">JavaScript ES6+</span>
+                <span class="tech-badge">Node.js</span>
+                <span class="tech-badge">npm</span>
+                <span class="tech-badge">React 18</span>
+                <span class="tech-badge">Vite</span>
+                <span class="tech-badge">Tailwind CSS</span>
+                <span class="tech-badge">Axios</span>
+                <span class="tech-badge">React Router</span>
+                <span class="tech-badge">Web Audio API</span>
+            </div>
+        </div>
+
+        <!-- Slide 4: Funcionalidades Detalladas -->
+        <div class="slide">
+            <h2>🚀 Funcionalidades Principales</h2>
+            
+            <h3>🔐 Flujo de Autenticación</h3>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    sequenceDiagram
+                        participant U as Usuario
+                        participant F as Frontend<br/>(React)
+                        participant B as Backend<br/>(Java)
+                        participant DB as Base de Datos<br/>(H2)
+                        
+                        U->>F: Ingresa username/password
+                        F->>B: POST /api/auth/login
+                        B->>DB: Valida credenciales
+                        DB-->>B: Usuario encontrado
+                        B->>B: Genera JWT token
+                        B->>F: Cookie HttpOnly con JWT
+                        F->>B: GET /api/auth/me
+                        B-->>F: Datos del usuario
+                        F->>U: Muestra Dashboard
+                </div>
+            </div>
+
+            <h3>🎤 Flujo de Creación de Texto</h3>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    flowchart LR
+                        A[Usuario escribe<br/>texto] --> B[Frontend<br/>React]
+                        B --> C[POST /api/texts<br/>JSON]
+                        C --> D[TextEntryController<br/>Java]
+                        D --> E[TtsService<br/>Java]
+                        E --> F[Google TTS API<br/>HTTP Request]
+                        F --> G[Audio MP3<br/>bytes]
+                        G --> H[Guarda en<br/>/uploads/audio/]
+                        H --> I[TextEntryRepository<br/>JPA]
+                        I --> J[(Base de Datos<br/>H2)]
+                        J --> K[Retorna<br/>TextEntryResponse]
+                        K --> L[Frontend muestra<br/>audio y texto]
+                </div>
+            </div>
+
+            <h3>📁 Flujo de Subida de Archivo</h3>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    flowchart TD
+                        A[Usuario sube<br/>archivo PDF/DOC] --> B[Frontend<br/>MultipartFile]
+                        B --> C[POST /api/texts/upload]
+                        C --> D{¿Tipo de<br/>archivo?}
+                        D -->|PDF| E[Apache PDFBox<br/>Extrae texto]
+                        D -->|DOC/DOCX| F[Apache POI<br/>Extrae texto]
+                        D -->|TXT| G[Lee directamente]
+                        E --> H[Texto extraído]
+                        F --> H
+                        G --> H
+                        H --> I[Google TTS API]
+                        I --> J[Audio MP3]
+                        J --> K[Guarda archivo]
+                        K --> L[Guarda en BD]
+                        L --> M[Retorna respuesta]
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Arquitectura SOLID Detallada -->
+        <div class="slide">
+            <h2>🏗️ Arquitectura SOLID (Java)</h2>
+            <p style="color: #666; margin-bottom: 20px;">
+                <strong>Implementada en el backend con Java y Spring Boot</strong>
+            </p>
+            
+            <h3>Separación de Responsabilidades</h3>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph TB
+                        A[AdminController] -->|usa| B[UserQueryService<br/>INTERFAZ]
+                        A -->|usa| C[UserCommandService<br/>INTERFAZ]
+                        B -->|implementado por| D[UserQueryServiceImpl<br/>SOLO consultas]
+                        C -->|implementado por| E[UserCommandServiceImpl<br/>SOLO comandos]
+                        D -->|usa| F[UserRepository<br/>JPA]
+                        E -->|usa| F
+                        D -->|usa| G[UserMapper<br/>SOLO mapeo]
+                        F -->|accede a| H[(Base de Datos<br/>H2)]
+                </div>
+            </div>
+
+            <h3>Flujo de Dependencias</h3>
+            <div class="flow-diagram">
+                <div class="flow-box">Controller<br/>(AdminController)</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Service Interface<br/>(UserQueryService)</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Service Impl<br/>(UserQueryServiceImpl)</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Repository<br/>(UserRepository)</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Database<br/>(H2)</div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Retos y Soluciones -->
+        <div class="slide">
+            <h2>🎯 Retos y Soluciones</h2>
+            
+            <div class="diagram-container">
+                <h4 style="color: #667eea; margin-bottom: 15px;">Flujo de Resolución de Problemas</h4>
+                <div class="mermaid">
+                    flowchart TD
+                        A[Problema Detectado] --> B{¿Tipo de<br/>problema?}
+                        B -->|Persistencia| C[Cambio H2<br/>in-memory → file-based]
+                        B -->|Proxy| D[Configurar /admin<br/>en vite.config.js]
+                        B -->|Arquitectura| E[Refactorizar<br/>SOLID]
+                        B -->|Autenticación| F[Verificación<br/>múltiple roles]
+                        C --> G[Solución<br/>Implementada]
+                        D --> G
+                        E --> G
+                        F --> G
+                        G --> H[Testing]
+                        H --> I[Funciona<br/>Correctamente]
+                </div>
+            </div>
+
+            <div class="challenge">
+                <h4>🔴 Reto 1: Persistencia de Datos</h4>
+                <p><strong>Problema:</strong> Usuarios no se guardaban, datos se perdían al reiniciar</p>
+            </div>
+            <div class="solution">
+                <p><strong>Solución:</strong> H2 file-based, saveAndFlush(), transacciones correctas, logs detallados</p>
+            </div>
+
+            <div class="challenge">
+                <h4>🔴 Reto 2: Proxy de Vite</h4>
+                <p><strong>Problema:</strong> Endpoints /admin devolvían HTML en lugar de JSON</p>
+            </div>
+            <div class="solution">
+                <p><strong>Solución:</strong> Configuración del proxy para /admin, manejo de errores mejorado</p>
+            </div>
+
+            <div class="challenge">
+                <h4>🔴 Reto 3: Arquitectura</h4>
+                <p><strong>Problema:</strong> Código acoplado, difícil de mantener</p>
+            </div>
+            <div class="solution">
+                <p><strong>Solución:</strong> Refactorización SOLID completa, separación de responsabilidades</p>
+            </div>
+
+            <div class="challenge">
+                <h4>🔴 Reto 4: Autenticación</h4>
+                <p><strong>Problema:</strong> Admin no podía acceder, cookies no se establecían</p>
+            </div>
+            <div class="solution">
+                <p><strong>Solución:</strong> Verificación múltiple de roles, delay en login, CORS correcto</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Desarrollo en 2 Semanas -->
+        <div class="slide">
+            <h2>📅 Desarrollo en 2 Semanas</h2>
+            
+            <div class="diagram-container">
+                <div class="mermaid">
+                    gantt
+                        title Timeline de Desarrollo
+                        dateFormat YYYY-MM-DD
+                        section Semana 1
+                        Configuración inicial        :a1, 2025-11-15, 2d
+                        Autenticación y JWT          :a2, after a1, 2d
+                        TTS y Endpoints              :a3, after a2, 3d
+                        section Semana 2
+                        Frontend React               :b1, 2025-11-22, 3d
+                        Panel Administración         :b2, after b1, 2d
+                        Refactorización SOLID        :b3, after b2, 2d
+                </div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>Semana 1: Fundamentos y Backend</h4>
+                    <ul>
+                        <li>Día 1-2: Configuración inicial, estructura del proyecto</li>
+                        <li>Día 3-4: Autenticación, JWT, Spring Security</li>
+                        <li>Día 5-7: Integración Google TTS, endpoints, extracción de archivos</li>
+                    </ul>
+                </div>
+                <div class="timeline-item">
+                    <h4>Semana 2: Frontend y Refinamiento</h4>
+                    <ul>
+                        <li>Día 8-10: React setup, páginas principales, dashboard</li>
+                        <li>Día 11-12: Panel de administración, gestión completa</li>
+                        <li>Día 13-14: Refactorización SOLID, corrección de bugs, documentación</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="stats" style="margin-top: 30px;">
+                <div class="stat-card">
+                    <div class="stat-number">5,000+</div>
+                    <div class="stat-label">Líneas de código</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">30+</div>
+                    <div class="stat-label">Archivos Java</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">15+</div>
+                    <div class="stat-label">Endpoints API</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Semanas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Características Técnicas -->
+        <div class="slide">
+            <h2>📊 Características Técnicas</h2>
+            <div class="features">
+                <div class="feature-card">
+                    <h4>🔒 Seguridad</h4>
+                    <ul>
+                        <li>JWT en cookies HttpOnly</li>
+                        <li>Bcrypt para contraseñas</li>
+                        <li>Validación de datos</li>
+                        <li>CORS configurado</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>💾 Persistencia</h4>
+                    <ul>
+                        <li>H2 file-based</li>
+                        <li>Transacciones @Transactional</li>
+                        <li>Eager/Lazy loading</li>
+                        <li>saveAndFlush()</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>🎨 UX/UI</h4>
+                    <ul>
+                        <li>Tailwind CSS</li>
+                        <li>Responsive design</li>
+                        <li>Música de fondo</li>
+                        <li>Feedback visual</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Conclusiones -->
+        <div class="slide">
+            <div class="conclusion">
+                <h2>🎉 Conclusiones</h2>
+                <div style="margin-top: 30px; font-size: 1.2em;">
+                    <p style="margin: 15px 0;">✅ Aplicación completa y funcional</p>
+                    <p style="margin: 15px 0;">✅ Arquitectura sólida (SOLID)</p>
+                    <p style="margin: 15px 0;">✅ Código de calidad y mantenible</p>
+                    <p style="margin: 15px 0;">✅ Experiencia de usuario excepcional</p>
+                </div>
+                <div style="margin-top: 40px;">
+                    <h3>Impacto del Proyecto</h3>
+                    <p style="font-size: 1.1em; margin-top: 20px;">
+                        Desarrollo full-stack completo, aplicación de principios SOLID en la práctica,
+                        integración de múltiples tecnologías, resultado funcional y listo para producción.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Información -->
+        <div class="slide">
+            <h2>📞 Información del Proyecto</h2>
+            <div style="text-align: center; margin-top: 50px;">
+                <h3 style="color: #667eea; font-size: 2em;">TTS APP</h3>
+                <p style="font-size: 1.3em; margin: 20px 0; color: #666;">
+                    Aplicación Web Full-Stack
+                </p>
+                <div style="margin: 40px 0;">
+                    <p><strong>Stack:</strong> Spring Boot + React</p>
+                    <p><strong>Duración:</strong> 2 semanas</p>
+                    <p><strong>Estado:</strong> ✅ Completo y Funcional</p>
+                    <p><strong>Ubicación:</strong> C:\Users\cadec\tts-app\</p>
+                </div>
+                <div style="margin-top: 50px;">
+                    <h3 style="color: #764ba2;">¡Gracias por su atención!</h3>
+                    <p style="margin-top: 20px; font-size: 1.1em;">
+                        ¿Preguntas?
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
