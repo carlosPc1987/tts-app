@@ -95,10 +95,17 @@ public class AdminController {
     }
 
     @GetMapping("/files")
-    public ResponseEntity<List<String>> getAllAudioFiles() {
+    public ResponseEntity<?> getAllAudioFiles(@RequestParam(required = false, defaultValue = "false") boolean detailed) {
         try {
-            List<String> files = ttsService.getAllAudioFiles();
-            return ResponseEntity.ok(files != null ? files : Collections.emptyList());
+            if (detailed) {
+                // Retornar información detallada
+                var files = ttsService.getAllAudioFilesWithInfo();
+                return ResponseEntity.ok(files != null ? files : Collections.emptyList());
+            } else {
+                // Retornar solo URLs (compatibilidad hacia atrás)
+                List<String> files = ttsService.getAllAudioFiles();
+                return ResponseEntity.ok(files != null ? files : Collections.emptyList());
+            }
         } catch (Exception e) {
             log.error("Error fetching all audio files for admin", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

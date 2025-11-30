@@ -13,7 +13,8 @@ const FileManagement = ({ onFileDeleted }) => {
   const fetchFiles = async () => {
     setLoading(true)
     try {
-      const response = await axios.get('/admin/files', {
+      // Solicitar información detallada
+      const response = await axios.get('/admin/files?detailed=true', {
         withCredentials: true
       })
       // Asegurar que siempre sea un array
@@ -32,9 +33,14 @@ const FileManagement = ({ onFileDeleted }) => {
     }
   }
 
-  const handleDelete = async (audioUrl) => {
-    const filename = audioUrl.substring(audioUrl.lastIndexOf('/') + 1)
-    if (!window.confirm(`¿Estás seguro de que deseas eliminar el archivo "${filename}"? Esta acción no se puede deshacer.`)) {
+  const handleDelete = async (file) => {
+    const audioUrl = typeof file === 'string' ? file : file.audioUrl
+    const filename = typeof file === 'string' 
+      ? file.substring(file.lastIndexOf('/') + 1)
+      : file.filename
+    const title = file.title || filename
+    
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar el archivo "${title}"?\n\nArchivo: ${filename}\n\nEsta acción no se puede deshacer.`)) {
       return
     }
 
@@ -46,7 +52,10 @@ const FileManagement = ({ onFileDeleted }) => {
       })
       // Asegurar que files sea un array antes de filtrar
       const currentFiles = Array.isArray(files) ? files : []
-      setFiles(currentFiles.filter((f) => f !== audioUrl))
+      setFiles(currentFiles.filter((f) => {
+        const fUrl = typeof f === 'string' ? f : f.audioUrl
+        return fUrl !== audioUrl
+      }))
       if (onFileDeleted) {
         onFileDeleted(audioUrl)
       }
@@ -58,8 +67,28 @@ const FileManagement = ({ onFileDeleted }) => {
     }
   }
 
-  const formatFileSize = (url) => {
-    return 'N/A'
+  const formatFileSize = (bytes) => {
+    if (!bytes || bytes === 0) return 'N/A'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A'
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } catch (e) {
+      return 'N/A'
+    }
   }
 
   // Asegurar que files siempre sea un array antes de renderizar
@@ -98,10 +127,16 @@ const FileManagement = ({ onFileDeleted }) => {
           <thead className="bg-gradient-to-r from-purple-800/30 to-blue-800/30">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-purple-200 uppercase tracking-wider">
-                Archivo
+                Título / Archivo
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-purple-200 uppercase tracking-wider">
-                URL
+                Usuario
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-purple-200 uppercase tracking-wider">
+                Fecha
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-purple-200 uppercase tracking-wider">
+                Tamaño
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-purple-200 uppercase tracking-wider">
                 Acciones
@@ -109,23 +144,60 @@ const FileManagement = ({ onFileDeleted }) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-purple-500/20">
-            {safeFiles.map((fileUrl) => {
-              const filename = fileUrl.substring(fileUrl.lastIndexOf('/') + 1)
+            {safeFiles.map((file) => {
+              // Compatibilidad: puede ser string (URL) u objeto (AudioFileInfo)
+              const isString = typeof file === 'string'
+              const audioUrl = isString ? file : file.audioUrl
+              const filename = isString 
+                ? file.substring(file.lastIndexOf('/') + 1)
+                : file.filename
+              const title = isString ? null : file.title
+              const username = isString ? null : file.username
+              const createdAt = isString ? null : file.createdAt
+              const fileSize = isString ? null : file.fileSize
+              
               return (
-                <tr key={fileUrl} className="hover:bg-purple-500/10 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-white flex items-center">
-                      <span className="mr-2">🎵</span>
-                      {filename}
+                <tr key={audioUrl} className="hover:bg-purple-500/10 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="text-sm">
+                      {title && title !== '(Sin texto asociado)' ? (
+                        <div className="font-medium text-white flex items-center">
+                          <span className="mr-2">📝</span>
+                          {title}
+                        </div>
+                      ) : null}
+                      <div className={`text-purple-300 text-xs mt-1 flex items-center ${title && title !== '(Sin texto asociado)' ? '' : 'font-medium'}`}>
+                        <span className="mr-2">🎵</span>
+                        {filename}
+                      </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-purple-200 truncate max-w-md">{fileUrl}</div>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-purple-200 flex items-center">
+                      <span className="mr-2">👤</span>
+                      {username && username !== '(Desconocido)' ? username : (
+                        <span className="text-purple-400 italic">Sin usuario</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-purple-200">
+                      {createdAt ? formatDate(createdAt) : (
+                        <span className="text-purple-400 italic">N/A</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-purple-200">
+                      {fileSize ? formatFileSize(fileSize) : (
+                        <span className="text-purple-400 italic">N/A</span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <div className="flex items-center space-x-4">
                       <a
-                        href={`http://localhost:8080${fileUrl}`}
+                        href={`http://localhost:8080${audioUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 hover:text-blue-200 px-4 py-2 rounded-lg transition-colors flex items-center"
@@ -134,12 +206,12 @@ const FileManagement = ({ onFileDeleted }) => {
                         Escuchar
                       </a>
                       <button
-                        onClick={() => handleDelete(fileUrl)}
-                        disabled={deleting === fileUrl}
+                        onClick={() => handleDelete(file)}
+                        disabled={deleting === audioUrl}
                         className="bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                       >
                         <span className="mr-2">🗑️</span>
-                        {deleting === fileUrl ? 'Eliminando...' : 'Eliminar'}
+                        {deleting === audioUrl ? 'Eliminando...' : 'Eliminar'}
                       </button>
                     </div>
                   </td>

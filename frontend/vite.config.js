@@ -9,12 +9,25 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('⚠️  Proxy error:', err.message);
+            console.log('💡 Make sure the backend is running on http://localhost:8080');
+            console.log('   Wait 30-60 seconds after starting the backend');
+          });
+        }
       },
       '/admin': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('⚠️  Proxy error:', err.message);
+            console.log('💡 Make sure the backend is running on http://localhost:8080');
+          });
+        }
       },
       '/uploads': {
         target: 'http://localhost:8080',

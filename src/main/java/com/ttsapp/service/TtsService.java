@@ -1,5 +1,9 @@
 package com.ttsapp.service;
 
+import com.ttsapp.dto.AudioFileInfo;
+import com.ttsapp.entity.TextEntry;
+import com.ttsapp.repository.TextEntryRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -16,16 +20,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class TtsService {
     
     private static final String GOOGLE_TTS_URL = "https://translate.google.com/translate_tts";
     private static final String UPLOAD_DIR = "uploads/audio";
     private final WebClient webClient;
+    private final TextEntryRepository textEntryRepository;
     
-    public TtsService() {
+    public TtsService(TextEntryRepository textEntryRepository) {
+        this.textEntryRepository = textEntryRepository;
         createUploadDirectory();
         this.webClient = WebClient.builder()
                 .defaultHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
@@ -214,6 +222,91 @@ public class TtsService {
                     .collect(java.util.stream.Collectors.toList());
         } catch (IOException e) {
             log.error("Error listing audio files", e);
+            return java.util.Collections.emptyList();
+        }
+    }
+
+    public List<AudioFileInfo> getAllAudioFilesWithInfo() {
+        try {
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                return java.util.Collections.emptyList();
+            }
+            
+            // Obtener todos los textos con audioUrl
+            List<TextEntry> textEntries = textEntryRepository.findAll().stream()
+                    .filter(entry -> entry.getAudioUrl() != null && !entry.getAudioUrl().isEmpty())
+                    .collect(Collectors.toList());
+            
+            // Crear un mapa de audioUrl -> TextEntry para búsqueda rápida
+            java.util.Map<String, TextEntry> audioUrlMap = textEntries.stream()
+                    .collect(Collectors.toMap(
+                            TextEntry::getAudioUrl,
+                            entry -> entry,
+                            (existing, replacement) -> existing // Si hay duplicados, mantener el primero
+                    ));
+            
+            // Listar archivos del sistema de archivos
+            return Files.list(uploadPath)
+                    .filter(Files::isRegularFile)
+                    .map(path -> {
+                        String filename = path.getFileName().toString();
+                        String audioUrl = "/uploads/audio/" + filename;
+                        
+                        // Buscar el TextEntry asociado
+                        TextEntry textEntry = audioUrlMap.get(audioUrl);
+                        
+                        try {
+                            long fileSize = Files.size(path);
+                            
+                            if (textEntry != null) {
+                                // Archivo asociado a un texto
+                                return AudioFileInfo.builder()
+                                        .filename(filename)
+                                        .audioUrl(audioUrl)
+                                        .title(textEntry.getTitle())
+                                        .username(textEntry.getUser().getUsername())
+                                        .textEntryId(textEntry.getId())
+                                        .createdAt(textEntry.getCreatedAt())
+                                        .fileSize(fileSize)
+                                        .build();
+                            } else {
+                                // Archivo huérfano (no asociado a ningún texto)
+                                return AudioFileInfo.builder()
+                                        .filename(filename)
+                                        .audioUrl(audioUrl)
+                                        .title("(Sin texto asociado)")
+                                        .username("(Desconocido)")
+                                        .textEntryId(null)
+                                        .createdAt(null)
+                                        .fileSize(fileSize)
+                                        .build();
+                            }
+                        } catch (IOException e) {
+                            log.warn("Error getting file size for: {}", filename, e);
+                            return AudioFileInfo.builder()
+                                    .filename(filename)
+                                    .audioUrl(audioUrl)
+                                    .title(textEntry != null ? textEntry.getTitle() : "(Sin texto asociado)")
+                                    .username(textEntry != null ? textEntry.getUser().getUsername() : "(Desconocido)")
+                                    .textEntryId(textEntry != null ? textEntry.getId() : null)
+                                    .createdAt(textEntry != null ? textEntry.getCreatedAt() : null)
+                                    .fileSize(0L)
+                                    .build();
+                        }
+                    })
+                    .sorted((a, b) -> {
+                        // Ordenar por fecha de creación (más reciente primero)
+                        if (a.getCreatedAt() != null && b.getCreatedAt() != null) {
+                            return b.getCreatedAt().compareTo(a.getCreatedAt());
+                        }
+                        if (a.getCreatedAt() != null) return -1;
+                        if (b.getCreatedAt() != null) return 1;
+                        return 0;
+                    })
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            log.error("Error listing audio files with info", e);
             return java.util.Collections.emptyList();
         }
     }
