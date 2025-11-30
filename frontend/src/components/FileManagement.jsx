@@ -13,21 +13,42 @@ const FileManagement = ({ onFileDeleted }) => {
   const fetchFiles = async () => {
     setLoading(true)
     try {
+      console.log('📥 Solicitando archivos al servidor...')
       // Solicitar información detallada
       const response = await axios.get('/admin/files?detailed=true', {
         withCredentials: true
       })
+      console.log('📤 Respuesta completa:', response)
+      console.log('📤 Status:', response.status)
+      console.log('📤 Data:', response.data)
+      console.log('📤 Data type:', typeof response.data)
+      console.log('📤 Is Array:', Array.isArray(response.data))
+      console.log('📤 Data length:', response.data?.length)
+      
       // Asegurar que siempre sea un array
       const data = response.data
       if (Array.isArray(data)) {
+        console.log('✅ Archivos recibidos correctamente:', data.length)
+        data.forEach((file, index) => {
+          console.log(`  ${index + 1}. ${file.title || file.filename} - Usuario: ${file.username || 'N/A'}`)
+        })
         setFiles(data)
       } else {
-        console.warn('La respuesta no es un array:', data)
+        console.error('❌ ERROR: La respuesta no es un array:', data)
+        console.error('Tipo de dato:', typeof data)
         setFiles([])
       }
     } catch (error) {
-      console.error('Error fetching files:', error)
+      console.error('❌ ERROR al obtener archivos:', error)
+      console.error('Error response:', error.response)
+      console.error('Error status:', error.response?.status)
+      console.error('Error data:', error.response?.data)
       setFiles([]) // Asegurar que siempre sea un array
+      if (error.response?.status === 403) {
+        alert('Error: No tienes permisos para ver archivos. Asegúrate de estar logueado como ADMIN.')
+      } else {
+        alert('Error al cargar archivos: ' + (error.response?.data?.message || error.message))
+      }
     } finally {
       setLoading(false)
     }

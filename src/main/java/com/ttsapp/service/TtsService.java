@@ -29,17 +29,18 @@ public class TtsService {
     
     private static final String GOOGLE_TTS_URL = "https://translate.google.com/translate_tts";
     private static final String UPLOAD_DIR = "uploads/audio";
-    private final WebClient webClient;
     private final TextEntryRepository textEntryRepository;
     
-    public TtsService(TextEntryRepository textEntryRepository) {
-        this.textEntryRepository = textEntryRepository;
+    // WebClient se inicializa después de crear el directorio
+    private final WebClient webClient = WebClient.builder()
+            .defaultHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+            .defaultHeader(HttpHeaders.ACCEPT, "audio/mpeg, audio/*, */*")
+            .defaultHeader(HttpHeaders.ACCEPT_LANGUAGE, "en-US,en;q=0.9")
+            .build();
+    
+    // Inicializar directorio al construir el bean
+    {
         createUploadDirectory();
-        this.webClient = WebClient.builder()
-                .defaultHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-                .defaultHeader(HttpHeaders.ACCEPT, "audio/mpeg, audio/*, */*")
-                .defaultHeader(HttpHeaders.ACCEPT_LANGUAGE, "en-US,en;q=0.9")
-                .build();
     }
     
     private void createUploadDirectory() {
@@ -228,84 +229,182 @@ public class TtsService {
 
     public List<AudioFileInfo> getAllAudioFilesWithInfo() {
         try {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            if (!Files.exists(uploadPath)) {
+            log.info("=== TtsService.getAllAudioFilesWithInfo() ===");
+            
+            // Obtener TODOS los textos con la relación User cargada usando EntityGraph
+            List<TextEntry> allTextEntries = textEntryRepository.findAllWithUser();
+            log.info("Total text entries in DB: {}", allTextEntries.size());
+            
+            // Filtrar los que tienen audioUrl
+            List<TextEntry> textEntries = allTextEntries.stream()
+                    .filter(entry -> {
+                        boolean hasAudioUrl = entry.getAudioUrl() != null && !entry.getAudioUrl().isEmpty();
+                        if (!hasAudioUrl) {
+                            log.debug("TextEntry {} (title: {}) has no audioUrl", entry.getId(), entry.getTitle());
+                        }
+                        return hasAudioUrl;
+                    })
+                    .collect(Collectors.toList());
+            
+            log.info("Found {} text entries with audioUrl (out of {})", textEntries.size(), allTextEntries.size());
+            
+            if (textEntries.isEmpty()) {
+                log.warn("No text entries with audioUrl found!");
+                if (!allTextEntries.isEmpty()) {
+                    log.warn("But there are {} text entries without audioUrl", allTextEntries.size());
+                    allTextEntries.forEach(entry -> {
+                        log.warn("  - TextEntry ID: {}, Title: {}, AudioUrl: {}", 
+                            entry.getId(), entry.getTitle(), entry.getAudioUrl());
+                    });
+                }
                 return java.util.Collections.emptyList();
             }
             
-            // Obtener todos los textos con audioUrl
-            List<TextEntry> textEntries = textEntryRepository.findAll().stream()
-                    .filter(entry -> entry.getAudioUrl() != null && !entry.getAudioUrl().isEmpty())
-                    .collect(Collectors.toList());
+            // Crear un mapa de archivos físicos si el directorio existe
+            java.util.Map<String, Long> physicalFiles = new java.util.HashMap<>();
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            if (Files.exists(uploadPath)) {
+                try {
+                    Files.list(uploadPath)
+                            .filter(Files::isRegularFile)
+                            .forEach(path -> {
+                                try {
+                                    String filename = path.getFileName().toString();
+                                    String audioUrl = "/uploads/audio/" + filename;
+                                    long fileSize = Files.size(path);
+                                    physicalFiles.put(audioUrl, fileSize);
+                                } catch (IOException e) {
+                                    log.warn("Error getting file size for: {}", path.getFileName(), e);
+                                }
+                            });
+                } catch (IOException e) {
+                    log.warn("Error listing physical files", e);
+                }
+            }
             
-            // Crear un mapa de audioUrl -> TextEntry para búsqueda rápida
-            java.util.Map<String, TextEntry> audioUrlMap = textEntries.stream()
-                    .collect(Collectors.toMap(
-                            TextEntry::getAudioUrl,
-                            entry -> entry,
-                            (existing, replacement) -> existing // Si hay duplicados, mantener el primero
-                    ));
+            log.info("Found {} physical files in directory", physicalFiles.size());
             
-            // Listar archivos del sistema de archivos
-            return Files.list(uploadPath)
-                    .filter(Files::isRegularFile)
-                    .map(path -> {
-                        String filename = path.getFileName().toString();
-                        String audioUrl = "/uploads/audio/" + filename;
-                        
-                        // Buscar el TextEntry asociado
-                        TextEntry textEntry = audioUrlMap.get(audioUrl);
-                        
-                        try {
-                            long fileSize = Files.size(path);
-                            
-                            if (textEntry != null) {
-                                // Archivo asociado a un texto
-                                return AudioFileInfo.builder()
-                                        .filename(filename)
-                                        .audioUrl(audioUrl)
-                                        .title(textEntry.getTitle())
-                                        .username(textEntry.getUser().getUsername())
-                                        .textEntryId(textEntry.getId())
-                                        .createdAt(textEntry.getCreatedAt())
-                                        .fileSize(fileSize)
-                                        .build();
-                            } else {
-                                // Archivo huérfano (no asociado a ningún texto)
-                                return AudioFileInfo.builder()
-                                        .filename(filename)
-                                        .audioUrl(audioUrl)
-                                        .title("(Sin texto asociado)")
-                                        .username("(Desconocido)")
-                                        .textEntryId(null)
-                                        .createdAt(null)
-                                        .fileSize(fileSize)
-                                        .build();
-                            }
-                        } catch (IOException e) {
-                            log.warn("Error getting file size for: {}", filename, e);
-                            return AudioFileInfo.builder()
-                                    .filename(filename)
-                                    .audioUrl(audioUrl)
-                                    .title(textEntry != null ? textEntry.getTitle() : "(Sin texto asociado)")
-                                    .username(textEntry != null ? textEntry.getUser().getUsername() : "(Desconocido)")
-                                    .textEntryId(textEntry != null ? textEntry.getId() : null)
-                                    .createdAt(textEntry != null ? textEntry.getCreatedAt() : null)
-                                    .fileSize(0L)
-                                    .build();
+            // Crear AudioFileInfo para cada TextEntry con audioUrl
+            List<AudioFileInfo> result = new java.util.ArrayList<>();
+            for (TextEntry textEntry : textEntries) {
+                try {
+                    String audioUrl = textEntry.getAudioUrl();
+                    log.debug("Processing TextEntry ID: {}, Title: {}, AudioUrl: {}", 
+                        textEntry.getId(), textEntry.getTitle(), audioUrl);
+                    
+                    String filename = audioUrl.substring(audioUrl.lastIndexOf("/") + 1);
+                    Long fileSize = physicalFiles.get(audioUrl);
+                    
+                    // Si el archivo físico no existe, usar 0 como tamaño
+                    if (fileSize == null) {
+                        log.warn("Physical file not found for audioUrl: {} (but TextEntry exists)", audioUrl);
+                        fileSize = 0L;
+                    } else {
+                        log.debug("Physical file found: {} (size: {} bytes)", filename, fileSize);
+                    }
+                    
+                    // Obtener username de forma segura (User ya está cargado por @EntityGraph)
+                    String username = "(Desconocido)";
+                    try {
+                        if (textEntry.getUser() != null) {
+                            username = textEntry.getUser().getUsername();
+                            log.debug("Username for TextEntry {}: {}", textEntry.getId(), username);
+                        } else {
+                            log.warn("TextEntry {} has no user associated", textEntry.getId());
                         }
-                    })
-                    .sorted((a, b) -> {
-                        // Ordenar por fecha de creación (más reciente primero)
-                        if (a.getCreatedAt() != null && b.getCreatedAt() != null) {
-                            return b.getCreatedAt().compareTo(a.getCreatedAt());
-                        }
-                        if (a.getCreatedAt() != null) return -1;
-                        if (b.getCreatedAt() != null) return 1;
-                        return 0;
-                    })
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
+                    } catch (Exception e) {
+                        log.error("Error getting username for TextEntry {}", textEntry.getId(), e);
+                        e.printStackTrace();
+                    }
+                    
+                    // Obtener fecha de forma segura
+                    java.time.LocalDateTime createdAt = textEntry.getCreatedAt();
+                    if (createdAt == null) {
+                        log.warn("TextEntry {} has no createdAt date", textEntry.getId());
+                    } else {
+                        log.debug("CreatedAt for TextEntry {}: {}", textEntry.getId(), createdAt);
+                    }
+                    
+                    log.debug("Creating AudioFileInfo: filename={}, title={}, username={}", 
+                        filename, textEntry.getTitle(), username);
+                    
+                    AudioFileInfo info = AudioFileInfo.builder()
+                            .filename(filename)
+                            .audioUrl(audioUrl)
+                            .title(textEntry.getTitle())
+                            .username(username)
+                            .textEntryId(textEntry.getId())
+                            .createdAt(textEntry.getCreatedAt())
+                            .fileSize(fileSize)
+                            .build();
+                    
+                    result.add(info);
+                    log.info("✅ AudioFileInfo created: {} - {} (user: {}, date: {})", 
+                        filename, textEntry.getTitle(), username, textEntry.getCreatedAt());
+                } catch (Exception e) {
+                    log.error("Error processing TextEntry ID: {}, Title: {}", 
+                        textEntry.getId(), textEntry.getTitle(), e);
+                }
+            }
+            
+            // Ordenar por fecha de creación (más reciente primero)
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() != null && b.getCreatedAt() != null) {
+                    return b.getCreatedAt().compareTo(a.getCreatedAt());
+                }
+                if (a.getCreatedAt() != null) return -1;
+                if (b.getCreatedAt() != null) return 1;
+                return 0;
+            });
+            
+            // Añadir archivos huérfanos (archivos físicos sin TextEntry asociado)
+            if (Files.exists(uploadPath)) {
+                try {
+                    Files.list(uploadPath)
+                            .filter(Files::isRegularFile)
+                            .forEach(path -> {
+                                try {
+                                    String filename = path.getFileName().toString();
+                                    String audioUrl = "/uploads/audio/" + filename;
+                                    
+                                    // Verificar si ya está en la lista
+                                    boolean exists = textEntries.stream()
+                                            .anyMatch(entry -> audioUrl.equals(entry.getAudioUrl()));
+                                    
+                                    if (!exists) {
+                                        // Archivo huérfano
+                                        long fileSize = Files.size(path);
+                                        result.add(AudioFileInfo.builder()
+                                                .filename(filename)
+                                                .audioUrl(audioUrl)
+                                                .title("(Sin texto asociado)")
+                                                .username("(Desconocido)")
+                                                .textEntryId(null)
+                                                .createdAt(null)
+                                                .fileSize(fileSize)
+                                                .build());
+                                    }
+                                } catch (IOException e) {
+                                    log.warn("Error processing orphan file: {}", path.getFileName(), e);
+                                }
+                            });
+                } catch (IOException e) {
+                    log.warn("Error listing orphan files", e);
+                }
+            }
+            
+            log.info("=== FIN getAllAudioFilesWithInfo ===");
+            log.info("Returning {} audio files with info", result.size());
+            if (result.isEmpty()) {
+                log.warn("⚠️  WARNING: No audio files returned! Check logs above for details.");
+            } else {
+                log.info("Files to return:");
+                result.forEach(file -> {
+                    log.info("  - {} ({} - {})", file.getFilename(), file.getTitle(), file.getUsername());
+                });
+            }
+            return result;
+        } catch (Exception e) {
             log.error("Error listing audio files with info", e);
             return java.util.Collections.emptyList();
         }
