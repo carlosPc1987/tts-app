@@ -366,20 +366,35 @@ Panel exclusivo para usuarios ADMIN que permite gestionar todo el sistema: usuar
 
 **Gestión de Archivos - ¿Cómo funciona?**
 
-**Listar Archivos:**
+**Listar Archivos (Mejorado):**
 1. Admin accede a "Administración > Archivos"
-2. `TtsService.getAllAudioFiles()` (Java):
-   - Lee directorio `/uploads/audio/`
-   - Lista todos los archivos `.mp3`
-   - Retorna URLs: `["/uploads/audio/a3f5b2c1.mp3", ...]`
-3. Frontend muestra lista con botón de reproducción
-4. Admin puede reproducir cualquier audio
+2. Frontend envía GET a `/admin/files?detailed=true`
+3. `TtsService.getAllAudioFilesWithInfo()` (Java):
+   - `TextEntryRepository.findAllWithUser()` con `@EntityGraph`:
+     - Carga todos los `TextEntry` con la relación `User` (no lazy)
+     - Ejecuta SQL: `SELECT t.*, u.* FROM text_entries t JOIN users u ON t.user_id = u.id`
+   - Filtra los que tienen `audioUrl` no nulo
+   - Lee directorio `/uploads/audio/` para obtener tamaños de archivos
+   - Crea `AudioFileInfo` DTOs con:
+     - Título del texto asociado
+     - Usuario que lo creó
+     - Fecha de creación
+     - Tamaño del archivo
+4. Retorna lista completa: `[{filename, title, username, createdAt, fileSize}, ...]`
+5. Frontend muestra tabla con todas las columnas
+6. Admin puede ver quién creó cada archivo y cuándo
 
 **Eliminar Archivo:**
 1. Admin elimina archivo de audio
 2. Se elimina físicamente del disco
 3. **Nota**: El `TextEntry` asociado queda con `audioUrl=null`
 4. Usuario ya no podrá reproducir ese audio
+
+**Mejoras Implementadas:**
+- **Información detallada**: Ya no solo URLs, ahora muestra título, usuario, fecha y tamaño
+- **@EntityGraph**: Evita problemas de lazy loading cargando User automáticamente
+- **Ordenamiento**: Archivos ordenados por fecha (más reciente primero)
+- **Archivos huérfanos**: También muestra archivos físicos sin texto asociado
 
 ---
 

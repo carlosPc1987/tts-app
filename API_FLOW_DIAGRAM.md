@@ -166,6 +166,44 @@ sequenceDiagram
     end
 ```
 
+## Admin Files Management Flow (Mejorado)
+
+```mermaid
+sequenceDiagram
+    participant Admin
+    participant Frontend
+    participant Security
+    participant AdminController
+    participant TtsService
+    participant TextEntryRepository
+    participant FileSystem
+    participant DB
+    
+    Admin->>Frontend: Click "Admin > Archivos"
+    Frontend->>Security: GET /admin/files?detailed=true<br/>(with JWT cookie)
+    Security->>Security: Check role == ADMIN
+    alt Is Admin
+        Security->>AdminController: Forward request
+        AdminController->>TtsService: getAllAudioFilesWithInfo()
+        TtsService->>TextEntryRepository: findAllWithUser()<br/>(@EntityGraph)
+        TextEntryRepository->>DB: SELECT t.*, u.* FROM text_entries t<br/>JOIN users u ON t.user_id = u.id
+        DB-->>TextEntryRepository: List<TextEntry> with User loaded
+        TextEntryRepository-->>TtsService: List<TextEntry>
+        TtsService->>TtsService: Filter entries with audioUrl
+        TtsService->>FileSystem: List physical files<br/>in /uploads/audio/
+        FileSystem-->>TtsService: File sizes map
+        TtsService->>TtsService: Create AudioFileInfo DTOs<br/>(title, username, date, size)
+        TtsService-->>AdminController: List<AudioFileInfo>
+        AdminController-->>Security: ResponseEntity<List<AudioFileInfo>>
+        Security-->>Frontend: 200 OK + JSON
+        Frontend->>Frontend: Render table with:<br/>- Título<br/>- Usuario<br/>- Fecha<br/>- Tamaño
+        Frontend-->>Admin: Display all files with details
+    else Not Admin
+        Security-->>Frontend: 403 Forbidden
+        Frontend-->>Admin: Access Denied
+    end
+```
+
 ## Registration Flow
 
 ```mermaid

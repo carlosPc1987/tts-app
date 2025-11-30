@@ -17,9 +17,18 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #7e22ce 50%, #9333ea 75%, #c026d3 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             color: #333;
             line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container {
@@ -29,15 +38,17 @@
         }
 
         .slide {
-            background: white;
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 40px;
             margin: 20px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
             min-height: 600px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            border: 2px solid rgba(255,255,255,0.2);
         }
 
         h1 {
@@ -210,35 +221,54 @@
         }
 
         .diagram-container {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             margin: 20px 0;
-            overflow-x: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .diagram-container {
+                grid-template-columns: 1fr;
+            }
         }
 
         .flow-diagram {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             flex-wrap: wrap;
             gap: 15px;
-            margin: 20px 0;
         }
 
         .flow-box {
+            display: inline-block;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 15px 25px;
-            border-radius: 10px;
-            text-align: center;
-            min-width: 120px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            margin: 10px;
+            min-width: 150px;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+        
+        .flow-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
         }
 
         .flow-arrow {
             font-size: 2em;
             color: #667eea;
+            margin: 0 10px;
             font-weight: bold;
         }
 
@@ -263,42 +293,66 @@
         }
 
         .mermaid {
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
         }
-
-        .mermaid {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
+        
+        .diagram-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             margin: 20px 0;
         }
-
-        .flow-diagram {
-            background: #f8f9fa;
+        
+        .diagram-explanation {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
             padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            backdrop-filter: blur(5px);
         }
-
-        .flow-box {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            margin: 10px;
-            min-width: 150px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .flow-arrow {
-            font-size: 2em;
+        
+        .diagram-explanation h4 {
             color: #667eea;
-            margin: 0 10px;
+            margin-bottom: 15px;
+            font-size: 1.2em;
         }
+        
+        .diagram-explanation ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .diagram-explanation li {
+            margin: 8px 0;
+            color: #555;
+        }
+        
+        .class-explanation {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #28a745;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .class-explanation h5 {
+            color: #28a745;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .class-explanation p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 0.95em;
+        }
+
 
         .architecture-diagram {
             display: grid;
@@ -311,13 +365,21 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 15px;
             text-align: center;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .arch-layer:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
         }
 
         .arch-layer h4 {
             margin-bottom: 15px;
             font-size: 1.3em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         @media print {
@@ -478,6 +540,27 @@
                         B-->>F: Datos del usuario
                         F->>U: Muestra Dashboard
                 </div>
+                <div class="diagram-explanation">
+                    <h4>🔍 Componentes del Flujo</h4>
+                    <div class="class-explanation">
+                        <h5>Frontend (React)</h5>
+                        <p><strong>AuthContext:</strong> Maneja estado global del usuario</p>
+                        <p><strong>Axios:</strong> Envía peticiones HTTP con withCredentials: true</p>
+                        <p><strong>React Router:</strong> Protege rutas, redirige si no autenticado</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>Backend (Java)</h5>
+                        <p><strong>AuthController:</strong> Recibe POST /api/auth/login</p>
+                        <p><strong>AuthenticationManager:</strong> Valida username/password</p>
+                        <p><strong>JwtTokenProvider:</strong> Genera token JWT con username y role</p>
+                        <p><strong>Cookie:</strong> HttpOnly=true, Secure=false (dev), Path=/, MaxAge=86400</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>Base de Datos</h5>
+                        <p><strong>Query:</strong> SELECT * FROM users WHERE username = ?</p>
+                        <p><strong>Validación:</strong> PasswordEncoder.matches(password, hash)</p>
+                    </div>
+                </div>
             </div>
 
             <h3>🎤 Flujo de Creación de Texto</h3>
@@ -495,6 +578,27 @@
                         I --> J[(Base de Datos<br/>H2)]
                         J --> K[Retorna<br/>TextEntryResponse]
                         K --> L[Frontend muestra<br/>audio y texto]
+                </div>
+                <div class="diagram-explanation">
+                    <h4>🔍 Componentes del Flujo</h4>
+                    <div class="class-explanation">
+                        <h5>TextEntryController</h5>
+                        <p><strong>Método:</strong> createTextEntry(@RequestBody TextEntryRequest)</p>
+                        <p><strong>Valida:</strong> @Valid en el request</p>
+                        <p><strong>Llama:</strong> TextEntryService.createTextEntry()</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>TtsService</h5>
+                        <p><strong>generateAudio():</strong> Llama a Google TTS API, retorna bytes MP3</p>
+                        <p><strong>saveAudio():</strong> Guarda bytes en /uploads/audio/{UUID}.mp3</p>
+                        <p><strong>Retorna:</strong> URL del archivo guardado</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>TextEntryRepository</h5>
+                        <p><strong>save():</strong> JPA ejecuta INSERT INTO text_entries</p>
+                        <p><strong>saveAndFlush():</strong> Guarda y fuerza flush inmediato</p>
+                        <p><strong>Retorna:</strong> TextEntry entity con ID generado</p>
+                    </div>
                 </div>
             </div>
 
@@ -516,6 +620,78 @@
                         J --> K[Guarda archivo]
                         K --> L[Guarda en BD]
                         L --> M[Retorna respuesta]
+                </div>
+                <div class="diagram-explanation">
+                    <h4>🔍 Componentes del Flujo</h4>
+                    <div class="class-explanation">
+                        <h5>FileTextExtractorService</h5>
+                        <p><strong>extractText():</strong> Detecta tipo de archivo y extrae texto</p>
+                        <p><strong>PDF:</strong> PDDocument.load(), extrae todas las páginas</p>
+                        <p><strong>DOC/DOCX:</strong> XWPFDocument/HWPFDocument, extrae párrafos</p>
+                        <p><strong>TXT:</strong> new String(file.getBytes(), UTF_8)</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>TextEntryService</h5>
+                        <p><strong>createTextEntry():</strong> Crea TextEntry con texto extraído</p>
+                        <p><strong>Llama:</strong> TtsService para generar audio</p>
+                        <p><strong>Guarda:</strong> TextEntry con audioUrl en base de datos</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>📁 Gestión de Archivos (Admin) - Mejorado</h3>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    sequenceDiagram
+                        participant Admin
+                        participant Frontend
+                        participant AdminController
+                        participant TtsService
+                        participant Repository
+                        participant DB
+                        participant FileSystem
+                        
+                        Admin->>Frontend: Click "Admin > Archivos"
+                        Frontend->>AdminController: GET /admin/files?detailed=true
+                        AdminController->>TtsService: getAllAudioFilesWithInfo()
+                        TtsService->>Repository: findAllWithUser()<br/>(@EntityGraph)
+                        Repository->>DB: SELECT con JOIN users
+                        DB-->>Repository: TextEntry + User
+                        Repository-->>TtsService: List<TextEntry>
+                        TtsService->>FileSystem: List /uploads/audio/
+                        FileSystem-->>TtsService: File sizes
+                        TtsService->>TtsService: Create AudioFileInfo<br/>(title, user, date, size)
+                        TtsService-->>AdminController: List<AudioFileInfo>
+                        AdminController-->>Frontend: JSON con info completa
+                        Frontend->>Frontend: Render table:<br/>Título, Usuario, Fecha, Tamaño
+                        Frontend-->>Admin: Tabla completa
+                </div>
+                <div class="diagram-explanation">
+                    <h4>🔍 Componentes del Flujo</h4>
+                    <div class="class-explanation">
+                        <h5>TextEntryRepository.findAllWithUser()</h5>
+                        <p><strong>@EntityGraph:</strong> Carga User automáticamente (no lazy)</p>
+                        <p><strong>SQL:</strong> SELECT t.*, u.* FROM text_entries t JOIN users u</p>
+                        <p><strong>Evita:</strong> LazyInitializationException</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>TtsService.getAllAudioFilesWithInfo()</h5>
+                        <p><strong>Obtiene:</strong> Todos los TextEntry con audioUrl</p>
+                        <p><strong>Lee:</strong> Archivos físicos para obtener tamaños</p>
+                        <p><strong>Crea:</strong> AudioFileInfo DTOs con información completa</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>AudioFileInfo (DTO)</h5>
+                        <p><strong>Campos:</strong> filename, audioUrl, title, username, createdAt, fileSize</p>
+                        <p><strong>Propósito:</strong> Transferir información completa al frontend</p>
+                        <p><strong>Ventaja:</strong> Un solo objeto con toda la info necesaria</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>FileManagement.jsx</h5>
+                        <p><strong>Renderiza:</strong> Tabla con columnas: Título, Usuario, Fecha, Tamaño</p>
+                        <p><strong>Formatea:</strong> Fecha con toLocaleDateString(), tamaño con KB/MB</p>
+                        <p><strong>Ordena:</strong> Por fecha (más reciente primero)</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -540,19 +716,66 @@
                         D -->|usa| G[UserMapper<br/>SOLO mapeo]
                         F -->|accede a| H[(Base de Datos<br/>H2)]
                 </div>
+                <div class="diagram-explanation">
+                    <h4>🔍 Explicación de Clases</h4>
+                    <div class="class-explanation">
+                        <h5>AdminController</h5>
+                        <p><strong>Responsabilidad:</strong> Recibe peticiones HTTP, delega a Services</p>
+                        <p><strong>Depende de:</strong> Interfaces (UserQueryService, UserCommandService)</p>
+                        <p><strong>Ventaja:</strong> No conoce implementaciones concretas (DIP)</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>UserQueryService (Interfaz)</h5>
+                        <p><strong>Métodos:</strong> getAllUsers(), getUserById(), getCurrentUser()</p>
+                        <p><strong>Propósito:</strong> Solo operaciones de lectura (SRP)</p>
+                        <p><strong>Implementación:</strong> UserQueryServiceImpl</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>UserCommandService (Interfaz)</h5>
+                        <p><strong>Métodos:</strong> register(), login(), deleteUser()</p>
+                        <p><strong>Propósito:</strong> Solo operaciones de escritura (SRP)</p>
+                        <p><strong>Implementación:</strong> UserCommandServiceImpl</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>UserMapper</h5>
+                        <p><strong>Responsabilidad:</strong> Convierte User Entity → UserResponse DTO</p>
+                        <p><strong>Métodos:</strong> toResponse(), toResponseList()</p>
+                        <p><strong>Ventaja:</strong> Separación de lógica de mapeo (SRP)</p>
+                    </div>
+                </div>
             </div>
 
             <h3>Flujo de Dependencias</h3>
-            <div class="flow-diagram">
-                <div class="flow-box">Controller<br/>(AdminController)</div>
-                <div class="flow-arrow">→</div>
-                <div class="flow-box">Service Interface<br/>(UserQueryService)</div>
-                <div class="flow-arrow">→</div>
-                <div class="flow-box">Service Impl<br/>(UserQueryServiceImpl)</div>
-                <div class="flow-arrow">→</div>
-                <div class="flow-box">Repository<br/>(UserRepository)</div>
-                <div class="flow-arrow">→</div>
-                <div class="flow-box">Database<br/>(H2)</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                <div class="flow-diagram">
+                    <div class="flow-box">Controller<br/>(AdminController)</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Service Interface<br/>(UserQueryService)</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Service Impl<br/>(UserQueryServiceImpl)</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Repository<br/>(UserRepository)</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Database<br/>(H2)</div>
+                </div>
+                <div class="diagram-explanation">
+                    <h4>💡 Principios Aplicados</h4>
+                    <div class="class-explanation">
+                        <h5>Dependency Inversion (DIP)</h5>
+                        <p>Controller depende de <strong>interfaces</strong>, no de implementaciones</p>
+                        <p>Permite cambiar implementación sin afectar Controller</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>Single Responsibility (SRP)</h5>
+                        <p>Cada clase tiene <strong>una sola responsabilidad</strong></p>
+                        <p>QueryService solo lee, CommandService solo escribe</p>
+                    </div>
+                    <div class="class-explanation">
+                        <h5>Interface Segregation (ISP)</h5>
+                        <p>Interfaces <strong>pequeñas y específicas</strong></p>
+                        <p>No fuerzas implementar métodos innecesarios</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -569,12 +792,29 @@
                         B -->|Proxy| D[Configurar /admin<br/>en vite.config.js]
                         B -->|Arquitectura| E[Refactorizar<br/>SOLID]
                         B -->|Autenticación| F[Verificación<br/>múltiple roles]
-                        C --> G[Solución<br/>Implementada]
-                        D --> G
-                        E --> G
-                        F --> G
-                        G --> H[Testing]
-                        H --> I[Funciona<br/>Correctamente]
+                        B -->|Lazy Loading| G[@EntityGraph<br/>findAllWithUser]
+                        B -->|Visualización| H[AudioFileInfo DTO<br/>Información completa]
+                        C --> I[Solución<br/>Implementada]
+                        D --> I
+                        E --> I
+                        F --> I
+                        G --> I
+                        H --> I
+                        I --> J[Testing]
+                        J --> K[Funciona<br/>Correctamente]
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h4 style="color: #667eea;">Mejoras Recientes</h4>
+                <div style="background: #d4edda; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                    <p><strong>✅ Gestión de Archivos Mejorada:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Información detallada: título, usuario, fecha, tamaño</li>
+                        <li>Uso de @EntityGraph para evitar lazy loading</li>
+                        <li>Nuevo DTO AudioFileInfo para transferencia completa</li>
+                        <li>Mejor visualización en tabla admin</li>
+                    </ul>
                 </div>
             </div>
 
@@ -703,7 +943,7 @@
             </div>
         </div>
 
-        <!-- Slide 9: Conclusiones -->
+        <!-- Slide 10: Conclusiones -->
         <div class="slide">
             <div class="conclusion">
                 <h2>🎉 Conclusiones</h2>
@@ -712,18 +952,21 @@
                     <p style="margin: 15px 0;">✅ Arquitectura sólida (SOLID)</p>
                     <p style="margin: 15px 0;">✅ Código de calidad y mantenible</p>
                     <p style="margin: 15px 0;">✅ Experiencia de usuario excepcional</p>
+                    <p style="margin: 15px 0;">✅ Gestión de archivos mejorada con información detallada</p>
+                    <p style="margin: 15px 0;">✅ Optimizaciones técnicas implementadas</p>
                 </div>
                 <div style="margin-top: 40px;">
                     <h3>Impacto del Proyecto</h3>
                     <p style="font-size: 1.1em; margin-top: 20px;">
                         Desarrollo full-stack completo, aplicación de principios SOLID en la práctica,
-                        integración de múltiples tecnologías, resultado funcional y listo para producción.
+                        integración de múltiples tecnologías, optimizaciones de rendimiento (@EntityGraph),
+                        resultado funcional y listo para producción.
                     </p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 10: Información -->
+        <!-- Slide 11: Información -->
         <div class="slide">
             <h2>📞 Información del Proyecto</h2>
             <div style="text-align: center; margin-top: 50px;">
